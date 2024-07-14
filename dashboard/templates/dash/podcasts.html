@@ -1,0 +1,29 @@
+{% extends 'dash/base.html' %}
+{% load static %}
+{% block title %}Brainiac{% endblock %}
+{% block content %}
+<div class="align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-4xl text-purple-400">Videos</h1>
+    <br />
+    <p class="p mb-12">
+      Explore podcasts related to your interested subjects
+  </div>
+
+  
+
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    {% for playlist in playlists %}
+        <div class="max-w-sm bg-black border border-purple-400 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+            <a href="{{ playlist.link }}">
+                <img class="rounded-t-md" src="{{ playlist.thumbnail_url }}" alt="{{ playlist.title }}" />
+           
+            <div class="p-5 bg-black">
+                
+                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-white dark:text-white">{{ playlist.title }}</h5>
+                </a>
+               
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+  {% endblock %}
