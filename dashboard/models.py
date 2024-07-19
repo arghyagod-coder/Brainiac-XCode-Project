@@ -25,13 +25,23 @@ class Produce(models.Model):
         return getDetailsFromUID(self.farmerid)
 
 class Quiz(models.Model):
-    title = models.CharField(max_length=255)
+    score=models.IntegerField(default=0)
+    title = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.title
 
 class Question(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
-    text = models.CharField(max_length=255)
+    text = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.text
 
 class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    text = models.CharField(max_length=255)
+    text = models.CharField(max_length=200)
     is_correct = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.text

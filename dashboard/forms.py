@@ -1,78 +1,21 @@
 from django import forms
 
-SOIL_TYPES =  [
-    ('Sandy', 'Sandy'),
-    ('Loamy', 'Loamy'),
-    ('Clayey', 'Clayey'),
-    ('Red', 'Red'),
-    ('Black', 'Black'),
-    ]
-
-class CropRecommendationForm(forms.Form):
-    nitrogen = forms.IntegerField(label="Soil Nitrogen (N) Content",widget=forms.TextInput(attrs={
-        'class': 'appearance-none block w-full bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white',
-        'placeholder': 'Enter your soil nitrogen content'
-        }))
-    phosphorus = forms.IntegerField(label="Soil Phosphorus (P) Content",widget=forms.TextInput(attrs={
-        'class': 'appearance-none block w-full bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white',
-        'placeholder': 'Enter your soil phosphorus content'
-        }))
-    potassium = forms.IntegerField(label="Soil Potassium (K) Content",widget=forms.TextInput(attrs={
-        'class': 'appearance-none block w-full bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white',
-        'placeholder': 'Enter your soil potassium content'
-        }))
-    PH = forms.IntegerField(label="Soil PH Content",widget=forms.TextInput(attrs={
-        'class': 'appearance-none block w-full bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white',
-        'placeholder': 'Enter your soil nitrogen content'
-        }))
-    rainfall = forms.IntegerField(label="Rainfall",widget=forms.TextInput(attrs={
-        'class': 'appearance-none block w-full bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white',
-        'placeholder': 'Enter rainfall in mm'
-        }))
-
-
-class FertilizerPredictionForm(forms.Form):
-    nitrogen = forms.IntegerField(label="Soil Nitrogen (N) Content",widget=forms.TextInput(attrs={
-        'class': 'appearance-none block w-full bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white',
-        'placeholder': 'Enter your soil nitrogen content'
-        }))
-    phosphorus = forms.IntegerField(label="Soil Phosphorus (P) Content",widget=forms.TextInput(attrs={
-        'class': 'appearance-none block w-full bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white',
-        'placeholder': 'Enter your soil phosphorus content'
-        }))
-    potassium = forms.IntegerField(label="Soil Potassium (K) Content",widget=forms.TextInput(attrs={
-        'class': 'appearance-none block w-full bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white',
-        'placeholder': 'Enter your soil potassium content'
-        }))
-    moisture = forms.IntegerField(label="Soil Moisture Content",widget=forms.TextInput(attrs={
-        'class': 'appearance-none block w-full bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white',
-        'placeholder': 'Enter your soil moisture content'
-        }))
-    soil_type= forms.CharField(label='Soil Type', widget=forms.Select(choices=SOIL_TYPES, attrs={
-        'class': 'appearance-none block w-full bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white',
-        'placeholder': 'Enter your soil type'
-        }))
-    crop= forms.CharField(label='Name of your Crop', widget=forms.TextInput(attrs={
-        'class': 'appearance-none block w-full bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white',
-        'placeholder': 'Enter your crop name'
-        }))
-
 class UserInputForm(forms.Form):
     userinput = forms.CharField(label="User Input",widget=forms.TextInput(attrs={
         'class': 'appearance-none block bg-gray-900 text-white rounded py-3 px-4 mb-3 w-100 focus:outline-none ',
         'placeholder': 'Enter your query'
         }))
 
-class CropProduceListForm(forms.Form):
-    name = forms.CharField(label="Product Name",widget=forms.TextInput(attrs={
-        'class': 'appearance-none block w-full bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white',
-        'placeholder': 'Enter your commodity name'
-        }))
-    price = forms.IntegerField(label="Price per Quintal (in rupees)",widget=forms.TextInput(attrs={
-        'class': 'appearance-none block w-full bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white',
-        'placeholder': 'Enter your proposed price per quintal'
-        }))
-    quantity = forms.IntegerField(label="Available Quantity (in quintals)",widget=forms.TextInput(attrs={
-        'class': 'appearance-none block w-full bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white',
-        'placeholder': 'Enter the available produce quantity'
-        }))
+class QuizForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        questions = kwargs.pop('questions')
+        super(QuizForm, self).__init__(*args, **kwargs)
+        for question in questions:
+            self.fields[f'question_{question.id}'] = forms.ChoiceField(
+                
+                label=f"{question.id}. {question.text}",
+                choices=[(answer.id, answer.text) for answer in question.answer_set.all()],
+                widget=forms.RadioSelect(attrs={
+                    'class':'ml-8 bg-black text-gray-600 border-gray-300     '
+                })
+            )

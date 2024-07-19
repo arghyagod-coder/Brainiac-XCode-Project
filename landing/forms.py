@@ -1,6 +1,4 @@
 from django import forms
-from django_select2.forms import Select2MultipleWidget
-
 class RegisterUser(forms.Form):
     
     SUBJECT_CHOICES = (

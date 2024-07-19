@@ -1,10 +1,13 @@
 import datetime
 from django.shortcuts import render, redirect
 from .models import User, Produce
-from .forms import CropRecommendationForm, FertilizerPredictionForm, UserInputForm, CropProduceListForm
-import pickle, numpy as np
+from .forms import UserInputForm
 from django.template.defaulttags import register
-from .functions import getRelatedNews, GetResponse, fetch_playlists,fetch_videos
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse
+from .models import Quiz, Question
+from .forms import QuizForm
+from .functions import GetQuizes, GetResponse, fetch_playlists,fetch_videos, getRelatedNews
 
 
 @register.filter
@@ -34,32 +37,24 @@ def home_page(request):
     # try:              
     id = request.session["member_logged_id"]
     userlogged = getDetailsFromUID(id)
-
-    try:
-        my_products = Produce.objects.filter(farmerid = userlogged.id)
-        last = my_products.last()
-    except Exception as e:
-        print(e)
-        my_products = []
-        last = ""
-    
-    try:
-        public_products = Produce.objects.all()
-        last = my_products.last()
-    except Exception as e:
-        print(e)
-        public_products = []
-        last = ""
+    quizzes = Quiz.objects.all() 
+    news = getRelatedNews(userlogged.subjectlist[0])
+    qp = 0
+    for quiz in quizzes:
+        qp+=quiz.score
+    prog = (qp / (len(quizzes)*15)) ** 100
 
     context = {
         "user": userlogged,
-        "produces": my_products,
-        "produces_count": len(my_products),
-        "public_produces_count": len(public_products),
-        "last_listing": last,
-        'news': "",
-        'weather': ["bruh"],
+        "progress": prog,
+        "quiz_count": len(quizzes), 
+        "last_quiz": quizzes[0],
+        "quizzes": quizzes,
+        "news": news,
+        "points": qp
+        
     }
+    print(quizzes[0])
     return render(request, 'dash/home.html', context)
     
 def forum(request):
@@ -242,8 +237,16 @@ def learning_page(request):
                 query = form.cleaned_data['userinput']
                 pl = fetch_playlists(query)
                 print(pl)
+                context={
+                "userid": userlogged.id,
+                'form': form,
+                "user": userlogged,
+            }
+
                 try:
-                    return render(request, 'dash/learn.html', {'playlists': pl})
+                    return render(request, 'dash/learn.html', {'playlists': pl, "userid": userlogged.id,
+                'form': form,
+                "user": userlogged,})
 
                 except Exception as e:
                     print(e)
@@ -276,6 +279,65 @@ def learning_page(request):
         return redirect((f'/admin/404/'))
 
 
+
+def quiz_page(request):
+    try:
+        logged_id = request.session["member_logged_id"]
+        userlogged = getDetailsFromUID(logged_id)
+        
+        #print(pl)
+
+        context = {
+            "userid": userlogged.id,
+            "user": userlogged,
+            #"playlist_data":pl
+        }
+
+        if request.method == 'POST':
+            form = UserInputForm(request.POST)
+            if form.is_valid():
+                try:
+                    existinglog = request.session["chatlog"]
+                    del request.session['chatlog']
+                except Exception as e:
+                    print(e)
+                    pass
+
+                query = form.cleaned_data['userinput']
+                pl = GetQuizes(20, query,query)
+                print(pl)
+                try:
+                    return render(request, 'dash/quizzes.html', {'questions': pl})
+
+                except Exception as e:
+                    print(e)
+                    request.session["chatlog"] = {
+                        'queries': [query],
+                        'responses': ['res']
+                    }
+                
+                log = request.session["chatlog"]
+                context = {
+                    'userid': userlogged.id,
+                    'user': userlogged,
+                    'log' : log,
+                    'form' : form,
+                }
+
+        else:
+            form = UserInputForm()
+            context={
+                "userid": userlogged.id,
+                'form': form,
+                "user": userlogged,
+            }
+
+      
+        return render(request, 'dash/quizzes.html', context)
+    except Exception as e:
+        print(e)
+        request.session["error_message"] = "Please Login to Continue"
+        return redirect((f'/admin/404/'))
 
 
 
@@ -325,12 +387,32 @@ def podcasts(request):
 
 
 
+def quiz_view(request, quiz_id):
+    quiz = get_object_or_404(Quiz, id=quiz_id)
+    questions = quiz.question_set.all()
+
+    if request.method == 'POST':
+        form = QuizForm(request.POST, questions=questions)
+        if form.is_valid():
+            score = 0
+            for question in questions:
+                answer_id = form.cleaned_data[f'question_{question.id}']
+                answer = question.answer_set.get(id=answer_id)
+                if answer.is_correct:
+                    score += 1
+            quiz.score= score
+            quizzes = Quiz.objects.all() 
+            return render(request, 'dash/quiz_list.html', {"message":f'You scored {score}/{questions.count()}!!', "quizzes":quizzes})
+
+    else:
+        form = QuizForm(questions=questions)
+
+    return render(request, 'dash/quiz.html', {'quiz': quiz, 'form': form})
 
 
-
-
-
-
+def quizzes_view(request):
+    quizzes = Quiz.objects.all()  # Fetch all quizzes from the database
+    return render(request, 'dash/quiz_list.html', {'quizzes': quizzes})
 
 
 def logout_view(request):

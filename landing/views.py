@@ -39,7 +39,7 @@ def register(request):
         if form.is_valid():
             User.objects.create(**form.cleaned_data)
             # name = User.objects.get(email=form.cleaned_data['email']).name
-            return render(request, 'login.html', {
+            return redirect('/login', {
                 'registered' : True,
                 'form':LoginUser(),
             })
