@@ -10,7 +10,7 @@ SECRET_KEY = "illkillmyselftoday"
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['brainiac.h4ck.me']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
