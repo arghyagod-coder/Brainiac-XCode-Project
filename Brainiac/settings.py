@@ -10,7 +10,7 @@ SECRET_KEY = "illkillmyselftoday"
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['brainiac.h4ck.me']
+ALLOWED_HOSTS = ['brainiac.h4ck.me','brainiac-xcode-project.onrender.com']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
