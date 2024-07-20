@@ -37,24 +37,43 @@ def home_page(request):
     # try:              
     id = request.session["member_logged_id"]
     userlogged = getDetailsFromUID(id)
-    quizzes = Quiz.objects.all() 
+    quizzes = userlogged.quizes
     news = getRelatedNews(userlogged.subjectlist[0])
+   
     qp = 0
+    print(quizzes)
+    marks={}
+    i=0
     for quiz in quizzes:
-        qp+=quiz.score
-    prog = (qp / (len(quizzes)*15)) ** 100
-
-    context = {
+        qp+=quizzes[quiz]
+        marks.update({i:quizzes[quiz]})
+        i+=1
+    prog = 'no'
+    if len(quizzes)==0:
+        
+     context = {
         "user": userlogged,
         "progress": prog,
         "quiz_count": len(quizzes), 
-        "last_quiz": quizzes[0],
+        "last_quiz": marks,
         "quizzes": quizzes,
         "news": news,
-        "points": qp
+        "points": qp,
+        "avg":0
+    }
+    else:
+         context = {
+        "user": userlogged,
+        "progress": prog,
+        "quiz_count": len(quizzes), 
+        "last_quiz": marks,
+        "quizzes": quizzes,
+        "news": news,
+        "points": qp,
+        "avg":(qp/len(quizzes))
         
     }
-    print(quizzes[0])
+   
     return render(request, 'dash/home.html', context)
     
 def forum(request):
@@ -388,11 +407,15 @@ def podcasts(request):
 
 
 def quiz_view(request, quiz_id):
+
     quiz = get_object_or_404(Quiz, id=quiz_id)
     questions = quiz.question_set.all()
 
     if request.method == 'POST':
         form = QuizForm(request.POST, questions=questions)
+        id = request.session["member_logged_id"]
+        userlogged = getDetailsFromUID(id)
+        
         if form.is_valid():
             score = 0
             for question in questions:
@@ -402,6 +425,9 @@ def quiz_view(request, quiz_id):
                     score += 1
             quiz.score= score
             quizzes = Quiz.objects.all() 
+            userlogged.quizes.update({quiz.title:score})
+            userlogged.save()
+            print(userlogged.quizes)
             return render(request, 'dash/quiz_list.html', {"message":f'You scored {score}/{questions.count()}!!', "quizzes":quizzes})
 
     else:

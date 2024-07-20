@@ -9,7 +9,7 @@ class User(models.Model):
     password = models.CharField(max_length=50, blank=True, null=True)
     institution = models.CharField(max_length=200, blank=True, null=True)
     subjects = models.CharField(max_length=300, default="physics,math,chemistry")
-
+    quizes=  models.JSONField(default=dict)
     @property
     def subjectlist(self):
         l = self.subjects.split(",")

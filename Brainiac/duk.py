@@ -1,5 +1,11 @@
-import json
-from dashboard.models import Quiz, Question, Answer
+import json,os
+
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Brainiac.settings')
+
+# Setup Django
+django.setup()
+from dashboard.models import Quiz, Question
 
 # JSON data containing topics, questions, options, and answers
 json_data = [

@@ -37,12 +37,15 @@ def register(request):
     if request.method == 'POST':
         form = RegisterUser(request.POST)
         if form.is_valid():
-            User.objects.create(**form.cleaned_data)
+            try: 
+                User.objects.create(**form.cleaned_data)
+                return redirect((f'/login/'))
+            except Exception as e:
+                print(e)
+                request.session["error_message"] = e
+                return redirect((f'/admin/404/'))
             # name = User.objects.get(email=form.cleaned_data['email']).name
-            return redirect('/login', {
-                'registered' : True,
-                'form':LoginUser(),
-            })
+            
     else:
         form = RegisterUser()
 

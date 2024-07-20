@@ -49,21 +49,7 @@
 
 
         <!-- Pending Requests Card Example -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card text-purple-400 bg-black shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold  text-purple-400 text-uppercase mb-1">
-                                Pending Courses</div>
-                            <div class="h5 mb-0 font-weight-bold text-white">0</div>
-                        </div>
-                        <div class="col-auto">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+       
     </div>
 
     <!-- Content Row -->
@@ -82,18 +68,20 @@
                     <!-- Latest Quiz Section -->
                     <div class="mb-4">
                         <h2 class=" font-semibold text-white text-xl mb-6">Latest Quiz</h2>
+                        {% for quiz in quizzes %}
                         <div class="bg-black border border-purple-400 rounded-lg shadow-lg p-4">
-                            <h3 class="text-lg font-semibold text-purple-400 mb-2">{{ quizzes|index:0 }}</h3>
-                            <p class="text-gray-400 mb-2">Score: {{ last_quiz.score }}</p>
+                            <h3 class="text-lg font-semibold text-purple-400 mb-2">{{ quiz }}</h3>
+                            <p class="text-gray-400 mb-2">Score: {{ last_quiz|index:forloop.counter0}}</p>
                         </div>
+                        {% endfor %}
                     </div>
         
                     <!-- Quiz Performance Section -->
                     <div class="mb-4">
                         <h2 class="text-xl font-semibold text-white mb-2">Quiz Performance</h2>
                         <div class="bg-black border border-purple-400 rounded-lg shadow-lg p-4">
-                            <p class="text-gray-400 mb-2">Total Quizzes: 1</p>
-                            <p class="text-gray-400 mb-2">Average Score: 4</p>
+                            <p class="text-gray-400 mb-2">Total Quizzes: {{quiz_count}}</p>
+                            <p class="text-gray-400 mb-2">Average Score: {{avg}}</p>
                             <a href="/admin/quizzes" class="inline-block text-sm my-6 border-2  hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
                                 View All Quizzes
                             </a>
@@ -112,7 +100,7 @@
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header bg-black py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-purple-400">General Knowledge </h6>
+                    <h6 class="m-0 font-weight-bold text-purple-400">News</h6>
                 </div>
                 <!-- Card Body -->
                 <div class="card-body bg-black">
